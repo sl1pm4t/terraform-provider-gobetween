@@ -21,12 +21,14 @@ func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"host": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GB_HOST", ""),
 			},
 			"port": &schema.Schema{
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GB_PORT", 8888),
 			},
 			"username": &schema.Schema{
 				Type:     schema.TypeInt,
