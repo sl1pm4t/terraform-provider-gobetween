@@ -1,6 +1,6 @@
 # terraform-provider-gobetween
 
-Terraform Provider for the [gobetween](gobetween.io) load balancer 
+Terraform Provider for the [gobetween](http://gobetween.io) load balancer 
 
 ## Status
 
