@@ -1,0 +1,8 @@
+[logging]
+  level = "DEBUG"
+  output = "stdout"
+
+[api]
+  enabled = true
+  bind = ":8888"
+  cors = false

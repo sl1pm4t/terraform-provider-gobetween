@@ -4,7 +4,10 @@ test:
 	go test -timeout 20m -v ./gobetween
 
 testacc:
-	TF_LOG=debug TF_ACC=1 go test ./gobetween -v $(TESTARGS)
+	$(eval DOCKER_ID := $(shell docker run --rm -d -p 8888:8888 -v `pwd`/test/:/etc/gobetween/conf/:rw yyyar/gobetween))
+	TF_LOG=info TF_ACC=1 GB_HOST=localhost GB_PORT=8888 go test ./gobetween -v $(TESTARGS)
+	docker stop ${DOCKER_ID}
+	
 
 build:
 	go build -v
@@ -12,3 +15,6 @@ build:
 
 dev:
 	go build -v
+
+install:
+	go install -v

@@ -112,6 +112,51 @@ func resourceGobetweenServer() *schema.Resource {
 					},
 				},
 			},
+
+			"healthcheck": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"fails": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							ForceNew: true,
+							Default:  1,
+						},
+
+						"passes": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							ForceNew: true,
+							Default:  1,
+						},
+
+						"interval": {
+							Type:     schema.TypeString,
+							ForceNew: true,
+							Optional: true,
+							Default:  "2s",
+						},
+
+						"kind": {
+							Type:     schema.TypeString,
+							ForceNew: true,
+							Optional: true,
+							Default:  "ping",
+						},
+
+						"ping_timeout_duration": {
+							Type:     schema.TypeString,
+							ForceNew: true,
+							Optional: true,
+							Default:  "500ms",
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -144,6 +189,8 @@ func resourceGoBetweenServerCreate(d *schema.ResourceData, meta interface{}) err
 		s.BackendConnectionTimeout = &bct
 	}
 
+	// Discovery
+	//
 	// build static backend list
 	staticList := make([]string, 0)
 	if v, ok := d.GetOk("discovery.0.static_list"); ok {
@@ -160,6 +207,24 @@ func resourceGoBetweenServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 	if v, ok := d.GetOk("discovery.0.fail_policy"); ok {
 		s.Discovery.Failpolicy = v.(string)
+	}
+
+	// Healthcheck
+	//
+	if v, ok := d.GetOk("healthcheck.#"); ok && v.(int) > 0 {
+		h := &gb.HealthcheckConfig{
+			Kind:     "ping",
+			Interval: "2s",
+			Passes:   1,
+			Fails:    1,
+			Timeout:  "500ms",
+		}
+
+		if v, ok := d.GetOk("healthcheck.0.interval"); ok {
+			h.Interval = v.(string)
+		}
+
+		s.Healthcheck = h
 	}
 
 	err := c.Api.AddServer(name, s)
